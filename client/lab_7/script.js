@@ -11,7 +11,7 @@
     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 */
 
-function getRandomIntInclusive(min,max) {
+function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -22,7 +22,7 @@ function injectHTML(list) {
   target.innerHTML = '';
   const listEl = document.createElement('ol');
   target.appendChild(listEl);
-  list.forEach(item => {
+  list.forEach((item) => {
     const el = document.createElement('li');
     el.innerText = item.name;
     listEl.appendChild(el);
@@ -49,7 +49,7 @@ function processRestaurants(list) {
   const newArray = range.map((item) => {
     const index = getRandomIntInclusive(0, list.length);
     return list[index];
-  })
+  });
   return newArray;
 
 /*
@@ -58,18 +58,26 @@ function processRestaurants(list) {
         then select 15 random records
         and return an object containing only the restaurant's name, category, and geocoded location
         So we can inject them using the HTML injection function
-  
+
         You can find the column names by carefully looking at your single returned record
         https://data.princegeorgescountymd.gov/Health/Food-Inspection/umjn-t2iz
-  
+
       ## What to do in this function:
-  
+
       - Create an array of 15 empty elements (there are a lot of fun ways to do this, and also very basic ways)
       - using a .map function on that range,
       - Make a list of 15 random restaurants from your list of 100 from your data request
       - Return only their name, category, and location
       - Return the new list of 15 restaurants so we can work on it separately in the HTML injector
     */
+}
+function filterList(list, filterInputValue) {
+  return list.filter((item) => {
+    if (!item.name) { return; }
+    const lowerCaseName = item.name.toLowerCase();
+    const lowerCaseQuery = filterInputValue.toLowerCase();
+    return lowerCaseName.includes(lowerCaseQuery);
+  });
 }
 
 async function mainEvent() {
@@ -117,9 +125,13 @@ async function mainEvent() {
     loadAnimation.classList.remove('lds-ellipsis');
     loadAnimation.classList.add('lds-ellipsis_hidden');
 
-    form.addEventListener('input', (event)=> {
-      console.log(event.target.value)
-    })
+    let currentList = [];
+
+    form.addEventListener('input', (event) => {
+      console.log(event.target.value);
+      const filteredList = filterList(currentList, event.target.value);
+      injectHTML(filteredList);
+    });
 
     // And here's an eventListener! It's listening for a "submit" button specifically being clicked
     // this is a synchronous event event, because we already did our async request above, and waited for it to resolve
@@ -128,11 +140,10 @@ async function mainEvent() {
       submitEvent.preventDefault();
 
       // This constant will have the value of your 15-restaurant collection when it processes
-      const restaurantList = processRestaurants(arrayFromJson.data);
-      console.log(restaurantList);
+      currentList = processRestaurants(arrayFromJson.data);
 
       // And this function call will perform the "side effect" of injecting the HTML list for you
-      injectHTML(restaurantList);
+      injectHTML(currentList);
 
     // By separating the functions, we open the possibility of regenerating the list
     // without having to retrieve fresh data every time
