@@ -208,9 +208,6 @@ html {
     margin-bottom: 0.5rem;
   }
   
-  #map{
-    display:none;
-  }
   
   /* How To Write A Media Query For Small Screens */
   
@@ -298,6 +295,14 @@ html {
   .prev:hover,
   .next:hover {
     /* Pick a good background colour for your hover pseudoclass */
+  }
+
+  #map{
+    display: block;
+    width: 400px;
+    height: 380px;
+    border: 2px dashed rgb(99, 99, 99);
+    margin-bottom: 1rem;
   }
   
   .lds-ellipsis {
